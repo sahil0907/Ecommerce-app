@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps E-Shop</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .product-item { border-bottom: 1px solid #ddd; padding: 10px 0; display: flex; justify-content: space-between; }
+        input { padding: 8px; margin: 5px 0; width: 90%; }
+        button { background: #28a745; color: white; border: none; padding: 10px; cursor: pointer; width: 100%; }
+        .status { margin-top: 10px; font-size: 0.8em; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛍️ E-Commerce Level 0</h2>
+        <div id="product-list">Loading products...</div>
+        
+        <hr>
+        
+        <h3>Add Product</h3>
+        <input type="text" id="name" placeholder="Product Name">
+        <input type="number" id="price" placeholder="Price">
+        <button onclick="addProduct()">Add to Catalog</button>
+        
+        <div class="status" id="health-status">Checking system health...</div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
