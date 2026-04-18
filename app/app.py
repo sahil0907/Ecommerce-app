@@ -6,16 +6,17 @@ import os
 app = Flask(__name__)
 
 # --- DATABASE CONFIG ---
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_path = os.path.join(basedir, 'ecommerce.db')
+# --- DATABASE CONFIG (Version 2: PostgreSQL) ---
+# Format: postgresql://user:password@host:port/database
+# Since we are on Level 0, host is 'localhost'
+DB_USER = "ecom_user"
+DB_PASS = "ecom_password"
+DB_HOST = "localhost"
+DB_NAME = "ecom_db"
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize the database object BEFORE the models
 db = SQLAlchemy(app)
-
-# --- MODELS ---
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -31,7 +32,7 @@ def index():
 # 1. Health Check
 @app.route('/health', methods=['GET'])
 def health():
-    return jsonify({"status": "healthy", "tier": "monolith"}), 200
+    return jsonify({"status": "healthy", "tier": "tier-2"}), 200
 
 # 2. Product Catalog
 @app.route('/products', methods=['GET'])
