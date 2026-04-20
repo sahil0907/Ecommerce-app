@@ -1,0 +1,24 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store - E-Com</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container" style="max-width: 600px;">
+        <h2>Hello, {{ user }}!</h2>
+        <p>Available Products:</p>
+        <ul>
+            {% for p in products %}
+            <li>
+                <span><strong>{{ p.name }}</strong> - ${{ p.price }}</span>
+                <a href="/buy/{{ p.id }}"><button class="buy-btn">Buy Now</button></a>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="/logout" class="logout-link">Logout of System</a>
+    </div>
+</body>
+</html>
