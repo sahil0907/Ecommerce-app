@@ -1,14 +1,15 @@
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, jsonify, request, render_template # Add render_template
 import os
+from dotenv import load_dotenv  
+load_dotenv() 
 
 app = Flask(__name__)
+app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-key-only')
 
 # --- DATABASE CONFIG ---
 # --- DATABASE CONFIG (Version 2: PostgreSQL) ---
 # Format: postgresql://user:password@host:port/database
-# Since we are on Level 0, host is 'localhost'
 DB_USER = "ecom_user"
 DB_PASS = "ecom_password"
 DB_HOST = "localhost"
@@ -22,37 +23,52 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Float, nullable=False)
 
-# --- ROUTES ---
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False) # In Pro, we hash this!
 
-# Home Route to serve the Frontend
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_name = db.Column(db.String(100))
+    username = db.Column(db.String(80))   
 @app.route('/')
-def index():
-    return render_template('index.html')
+def login():
+    return render_template('login.html')
 
-# 1. Health Check
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({"status": "healthy", "tier": "tier-2"}), 200
-
-# 2. Product Catalog
-@app.route('/products', methods=['GET'])
-def get_products():
-    products = Product.query.all()
-    return jsonify([{"id": p.id, "name": p.name, "price": p.price} for p in products])
-
-# 3. Add Product
-@app.route('/products', methods=['POST'])
-def add_product():
-    data = request.get_json()
-    if not data or 'name' not in data or 'price' not in data:
-        return jsonify({"error": "Invalid data"}), 400
+@app.route('/login', methods=['POST'])
+def do_login():
+    username = request.form.get('username')
+    password = request.form.get('password')
     
-    new_product = Product(name=data['name'], price=data['price'])
-    db.session.add(new_product)
+    # Simple check: In v3 we will check the DB, for now let's just allow anyone
+    session['user'] = username
+    return redirect(url_for('products_page'))
+
+@app.route('/products')
+def products_page():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    products = Product.query.all()
+    return render_template('products.html', products=products, user=session['user'])
+
+@app.route('/buy/<int:product_id>')
+def buy_product(product_id):
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    product = Product.query.get(product_id)
+    new_order = Order(product_name=product.name, username=session['user'])
+    db.session.add(new_order)
     db.session.commit()
-    return jsonify({"message": "Product added!"}), 201
+    
+    return render_template('success.html', product_name=product.name)
 
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        # SEED DATA: Add a sample product if the table is empty
+        if not Product.query.first():
+            db.session.add(Product(name="DevOps Laptop", price=1200.00))
+            db.session.commit()
     app.run(host='0.0.0.0', port=5000, debug=True)
