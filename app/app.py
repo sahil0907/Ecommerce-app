@@ -6,16 +6,12 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'dev-key-only')
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    raise ValueError("CRITICAL: DATABASE_URL environment variable is not set!")
 
 # --- DATABASE CONFIG ---
-# --- DATABASE CONFIG (Version 2: PostgreSQL) ---
-# Format: postgresql://user:password@host:port/database
-DB_USER = "ecom_user"
-DB_PASS = "ecom_password"
-DB_HOST = "localhost"
-DB_NAME = "ecom_db"
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}'
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 class Product(db.Model):
