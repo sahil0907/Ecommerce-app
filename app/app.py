@@ -37,7 +37,6 @@ def do_login():
     username = request.form.get('username')
     password = request.form.get('password')
     
-    # Simple check: In v3 we will check the DB, for now let's just allow anyone
     session['user'] = username
     return redirect(url_for('products_page'))
 
@@ -59,7 +58,7 @@ def buy_product(product_id):
     db.session.commit()
     
     return render_template('success.html', product_name=product.name)
-
+ 
 def init_db():
     with app.app_context():
         db.create_all()
@@ -71,4 +70,5 @@ if __name__ == '__main__':
      init_db()
      app.run(host='0.0.0.0', port=5000, debug=True)
 
- 
+
+
