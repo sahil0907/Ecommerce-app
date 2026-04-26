@@ -60,11 +60,15 @@ def buy_product(product_id):
     
     return render_template('success.html', product_name=product.name)
 
-if __name__ == '__main__':
+def init_db():
     with app.app_context():
         db.create_all()
-        # SEED DATA: Add a sample product if the table is empty
         if not Product.query.first():
             db.session.add(Product(name="DevOps Laptop", price=1200.00))
             db.session.commit()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+
+if __name__ == '__main__':
+     init_db()
+     app.run(host='0.0.0.0', port=5000, debug=True)
+
+ 
